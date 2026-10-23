@@ -1,0 +1,11 @@
+{
+  "name": "فكها — تمدد المكتب",
+  "short_name": "فكها",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#12151c",
+  "theme_color": "#12151c",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": []
+}
