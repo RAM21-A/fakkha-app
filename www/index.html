@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>فكها — تمدد المكتب</title>
+<meta name="theme-color" content="#12151c">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --bg:#12151c; --bg2:#1a1f2b; --card:#1e2431; --line:#2b3345;
+  --txt:#e9edf5; --mut:#8f9bb3; --acc:#ff8a3d; --acc2:#ffb066;
+  --ok:#43d19e; --danger:#ff5c5c; --radius:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% 0%,#1b2130 0%,var(--bg) 60%);
+  color:var(--txt);
+  font-family:"Segoe UI",system-ui,-apple-system,"Noto Kufi Arabic",sans-serif;
+  font-size:16px; line-height:1.6; overscroll-behavior-y:none;
+  padding-top:env(safe-area-inset-top);
+}
+.app{max-width:520px;margin:0 auto;padding:0 16px 96px}
+.screen{display:none;animation:fade .25s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0 12px}
+.top h1{font-size:1.6rem;margin:0;font-weight:800;letter-spacing:-.5px}
+.sub{margin:2px 0 0;color:var(--mut);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.label{color:var(--mut);font-size:.82rem;display:block}
+.row{display:flex;justify-content:space-between;align-items:center}
+.small{font-size:.8rem;color:var(--mut);margin-top:6px}
+.mascot{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#232b3b,#1a1f2b);
+  border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.sloth{font-size:2.2rem;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+.mascot p{margin:0;font-size:.92rem;color:#cfd7e6}
+.next-card{text-align:center}
+.countdown{font-size:2.6rem;font-weight:800;letter-spacing:2px;color:var(--acc);
+  font-variant-numeric:tabular-nums;margin:6px 0 14px}
+.countdown.soon{animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.btn{border:0;border-radius:14px;padding:13px 18px;font-size:.95rem;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:.15s;color:#fff}
+.btn.primary{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#20140a}
+.btn.ghost{background:var(--bg2);color:var(--txt);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid #4a2a2a}
+.btn:active{transform:scale(.97)}
+.btn.wide{width:100%}
+.icon-btn{background:var(--bg2);border:1px solid var(--line);color:var(--txt);
+  width:40px;height:40px;border-radius:12px;font-size:1rem;cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.stat{text-align:center}
+.stat b{display:block;font-size:1.8rem;color:var(--acc);line-height:1.2}
+.stat small{color:var(--mut);font-size:.78rem}
+.cup{height:14px;background:var(--bg2);border-radius:8px;overflow:hidden;margin-top:10px}
+.cup-fill{height:100%;width:0;border-radius:8px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+.bar{height:10px;background:var(--bg2);border-radius:6px;overflow:hidden;margin-top:10px}
+.bar-fill{height:100%;width:0;background:linear-gradient(90deg,#43d19e,#7ef0c4);transition:width .5s}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:var(--bg2);border:1px solid var(--line);color:var(--mut);
+  padding:8px 14px;border-radius:999px;font-size:.85rem;white-space:nowrap;
+  cursor:pointer;font-family:inherit}
+.chip.on{background:var(--acc);color:#20140a;border-color:var(--acc);font-weight:700}
+.moves-list{display:flex;flex-direction:column;gap:10px}
+.move{display:flex;gap:14px;align-items:center;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);padding:12px;cursor:pointer}
+.move-art{width:64px;height:64px;flex:0 0 64px;background:var(--bg2);border-radius:14px;
+  display:grid;place-items:center;overflow:hidden}
+.move-art svg{width:52px;height:52px}
+.move h4{margin:0 0 2px;font-size:.95rem}
+.move p{margin:0;color:var(--mut);font-size:.78rem}
+.fig{width:100%;height:100%;overflow:visible}
+.fig .skull,.fig .torso,.fig .arm-l,.fig .arm-r,.fig .leg-l,.fig .leg-r{
+  fill:none;stroke:var(--txt);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.fig .eye{fill:var(--txt);stroke:none}
+.fig *{transform-box:view-box}
+.fig .upper{transform-origin:100px 180px}
+.fig .head{transform-origin:100px 92px}
+.fig .arm-l,.fig .arm-r{transform-origin:100px 108px}
+.fig .leg-l{transform-origin:100px 180px}
+.fig .leg-r{transform-origin:100px 180px}
+@keyframes kTilt{0%,100%{transform:rotate(0)}50%{transform:rotate(26deg)}}
+@keyframes kTuck{0%,100%{transform:translate(0,0)}50%{transform:translate(-2px,7px)}}
+@keyframes kRoll{0%{transform:rotate(-32deg)}50%{transform:rotate(32deg)}100%{transform:rotate(-32deg)}}
+@keyframes kShrug{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes kArmUpR{0%,100%{transform:rotate(0)}50%{transform:rotate(148deg)}}
+@keyframes kArmUpL{0%,100%{transform:rotate(0)}50%{transform:rotate(-148deg)}}
+@keyframes kOpen{0%,100%{transform:rotate(0)}50%{transform:rotate(-26deg)}}
+@keyframes kOpenR{0%,100%{transform:rotate(0)}50%{transform:rotate(26deg)}}
+@keyframes kTwist{0%,100%{transform:rotate(0)}50%{transform:rotate(16deg)}}
+@keyframes kArch{0%,100%{transform:rotate(0) scaleY(1)}50%{transform:rotate(-6deg) scaleY(.97)}}
+@keyframes kReach{0%,100%{transform:rotate(0)}50%{transform:rotate(70deg)}}
+@keyframes kHip{0%,100%{transform:rotate(0)}50%{transform:rotate(-18deg)}}
+@keyframes kBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes kLegCross{0%,100%{transform:rotate(0)}50%{transform:rotate(38deg)}}
+@keyframes kEyeMove{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.a-neck-tilt .head{animation:kTilt 3s ease-in-out infinite}
+.a-chin-tuck .head{animation:kTuck 2.6s ease-in-out infinite}
+.a-neck-roll .head{animation:kRoll 3.4s ease-in-out infinite}
+.a-shrug .upper{animation:kShrug 2s ease-in-out infinite}
+.a-trap .head{animation:kTilt 3s ease-in-out infinite}
+.a-trap .arm-r{animation:kArmUpR 3s ease-in-out infinite}
+.a-chest .arm-l{animation:kOpen 3s ease-in-out infinite}
+.a-chest .arm-r{animation:kOpenR 3s ease-in-out infinite}
+.a-shoulder-roll .arm-l{animation:kArmUpL 2.6s ease-in-out infinite}
+.a-shoulder-roll .arm-r{animation:kArmUpR 2.6s ease-in-out infinite}
+.a-twist .upper{animation:kTwist 4s ease-in-out infinite}
+.a-catcow .upper{animation:kArch 4s ease-in-out infinite}
+.a-upperback .arm-l{animation:kReach 3s ease-in-out infinite}
+.a-upperback .arm-r{animation:kReach 3s ease-in-out infinite}
+.a-wrist .arm-l{animation:kReach 2.4s ease-in-out infinite}
+.a-prayer .arm-l{animation:kReach 3s ease-in-out infinite}
+.a-prayer .arm-r{animation:kReach 3s ease-in-out infinite}
+.a-fingers .arm-l{animation:kReach 2s ease-in-out infinite}
+.a-figure4 .leg-r{animation:kLegCross 4s ease-in-out infinite}
+.a-hipflexor .upper{animation:kHip 3s ease-in-out infinite}
+.a-calf .upper,.a-calf .leg-l,.a-calf .leg-r{animation:kBounce 1.6s ease-in-out infinite}
+.a-eye .eye{animation:kEyeMove 3s ease-in-out infinite}
+.a-fullreach .arm-l{animation:kArmUpL 3s ease-in-out infinite}
+.a-fullreach .arm-r{animation:kArmUpR 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.fig *{animation:none!important}}
+.sec-title{font-size:.95rem;margin:20px 0 10px;color:var(--mut);font-weight:600}
+.week{display:flex;align-items:flex-end;gap:8px;height:110px}
+.week .day{flex:1;display:flex;flex-direction:column;justify-content:flex-end;
+  align-items:center;gap:6px;height:100%}
+.week .bar2{width:100%;background:linear-gradient(180deg,var(--acc),#c25c1d);
+  border-radius:6px 6px 0 0;min-height:3px;transition:height .4s}
+.week .dname{font-size:.7rem;color:var(--mut)}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:12px 6px;text-align:center;font-size:.72rem;color:var(--mut);opacity:.4}
+.badge.earned{opacity:1;border-color:var(--acc);color:var(--txt)}
+.badge .ico{display:block;font-size:1.5rem;margin-bottom:4px}
+.field{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.field:last-child{border-bottom:0}
+.field input,.field select{background:var(--bg2);border:1px solid var(--line);
+  color:var(--txt);border-radius:10px;padding:8px 10px;font-family:inherit;
+  font-size:.9rem;text-align:center;width:130px}
+.days{display:flex;gap:6px;margin-top:10px;justify-content:space-between}
+.days button{flex:1;padding:10px 0;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg2);color:var(--mut);font-family:inherit;font-size:.78rem;cursor:pointer}
+.days button.on{background:var(--acc);color:#20140a;border-color:var(--acc);font-weight:700}
+.hint{color:var(--mut);font-size:.78rem;margin:10px 0 0}
+.hint.center{text-align:center;margin:16px 0}
+.tabbar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;
+  display:flex;background:rgba(26,31,43,.94);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.tab{flex:1;background:none;border:0;color:var(--mut);font-family:inherit;
+  font-size:.7rem;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 0;cursor:pointer;border-radius:12px}
+.tab span{font-size:1.25rem}
+.tab.active{color:var(--acc)}
+.modal{position:fixed;inset:0;background:rgba(6,8,12,.78);backdrop-filter:blur(6px);
+  display:grid;place-items:center;padding:16px;z-index:100}
+.modal[hidden]{display:none}
+.modal-card{background:var(--card);border:1px solid var(--line);border-radius:26px;
+  width:100%;max-width:420px;max-height:92vh;overflow:auto;padding:18px;
+  animation:pop .3s cubic-bezier(.2,1.2,.4,1)}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:none}}
+.m-top{display:flex;justify-content:space-between;align-items:center}
+.m-art{height:170px;display:grid;place-items:center;margin:8px 0}
+.m-art svg{height:100%;width:auto}
+.modal-card h2{text-align:center;font-size:1.15rem;margin:0 0 12px}
+.ring-wrap{position:relative;width:110px;height:110px;margin:0 auto 14px}
+.ring{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg2);stroke-width:9}
+.ring-fg{fill:none;stroke:var(--acc);stroke-width:9;stroke-linecap:round;
+  stroke-dasharray:327;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear}
+.ring-wrap span{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+.steps{color:#cfd7e6;font-size:.88rem;padding-inline-start:20px;margin:0 0 16px}
+.steps li{margin-bottom:6px}
+.m-actions{display:flex;gap:10px}
+.m-actions .btn{flex:1}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--ok);color:#06231a;padding:12px 22px;border-radius:14px;
+  font-weight:700;font-size:.9rem;z-index:200;animation:pop .25s}
+.toast[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <section id="screen-home" class="screen active">
+    <header class="top">
+      <div><h1>فكها</h1><p class="sub">لا تخلّي جسمك يصير خشب 🪵</p></div>
+    </header>
+    <div class="mascot"><div class="sloth">🦥</div><p id="mascotText">يلا نبدأ…</p></div>
+    <div class="card next-card">
+      <span class="label">الاستراحة الجاية</span>
+      <div class="countdown" id="countdown">--:--</div>
+      <button id="btnStartNow" class="btn primary wide">ابدأ استراحة هلأ</button>
+    </div>
+    <div class="grid2">
+      <div class="card stat"><span class="label">السلسلة</span><b id="homeStreak">0</b><small>يوم 🔥</small></div>
+      <div class="card stat"><span class="label">اليوم</span><b id="homeToday">0/8</b><small>تمارين</small></div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="label">هدف اليوم</span><span id="goalPct">0%</span></div>
+      <div class="cup"><div class="cup-fill" id="cupFill"></div></div>
+    </div>
+  </section>
+
+  <section id="screen-moves" class="screen">
+    <header class="top"><h1>التمارين</h1></header>
+    <div class="chips" id="areaChips"></div>
+    <div id="movesList" class="moves-list"></div>
+  </section>
+
+  <section id="screen-progress" class="screen">
+    <header class="top"><h1>التقدم</h1></header>
+    <div class="card">
+      <div class="row"><span class="label">المستوى</span><span id="lvlName">—</span></div>
+      <div class="bar"><div class="bar-fill" id="lvlBar"></div></div>
+      <div class="row small"><span id="xpText">0 XP</span><span id="xpNext"></span></div>
+    </div>
+    <div class="grid2">
+      <div class="card stat"><span class="label">إجمالي</span><b id="statTotal">0</b><small>تمرين</small></div>
+      <div class="card stat"><span class="label">أطول سلسلة</span><b id="statBest">0</b><small>يوم</small></div>
+    </div>
+    <h3 class="sec-title">آخر ٧ أيام</h3>
+    <div class="card"><div class="week" id="weekChart"></div></div>
+    <h3 class="sec-title">الأوسمة</h3>
+    <div class="badges" id="badgesList"></div>
+  </section>
+
+  <section id="screen-settings" class="screen">
+    <header class="top"><h1>الإعدادات</h1></header>
+    <div class="card">
+      <label class="field"><span>بداية الدوام</span><input type="time" id="setStart"></label>
+      <label class="field"><span>نهاية الدوام</span><input type="time" id="setEnd"></label>
+      <label class="field"><span>كل كم دقيقة</span>
+        <select id="setInterval">
+          <option value="30">٣٠ دقيقة</option>
+          <option value="45">٤٥ دقيقة</option>
+          <option value="60">٦٠ دقيقة</option>
+          <option value="90">٩٠ دقيقة</option>
+          <option value="120">١٢٠ دقيقة</option>
+        </select>
+      </label>
+      <label class="field"><span>هدف اليوم</span><input type="number" id="setGoal" min="1" max="30"></label>
+    </div>
+    <div class="card">
+      <span class="label">أيام الدوام</span>
+      <div class="days" id="dayPicker"></div>
+    </div>
+    <div class="card">
+      <span class="label">أسلوب الكسلان 🦥</span>
+      <div class="chips" id="toneChips"></div>
+    </div>
+    <div class="card">
+      <button id="btnNotif" class="btn ghost wide">تفعيل الإشعارات</button>
+      <p class="hint" id="notifHint">الإشعارات بتشتغل حتى والتلفون مقفول 🔒</p>
+    </div>
+    <button id="btnReset" class="btn danger wide">مسح كل البيانات</button>
+    <p class="hint center">كل شي محفوظ على جهازك فقط 🔒</p>
+  </section>
+
+  <nav class="tabbar">
+    <button data-go="home" class="tab active"><span>🏠</span>الرئيسية</button>
+    <button data-go="moves" class="tab"><span>🤸</span>التمارين</button>
+    <button data-go="progress" class="tab"><span>📈</span>التقدم</button>
+    <button data-go="settings" class="tab"><span>⚙️</span>الإعدادات</button>
+  </nav>
+</div>
+
+<div class="modal" id="breakModal" hidden>
+  <div class="modal-card">
+    <div class="m-top"><span class="chip" id="mArea"></span><button class="icon-btn" id="mClose">✕</button></div>
+    <div class="m-art" id="mArt"></div>
+    <h2 id="mName"></h2>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52"/>
+        <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"/>
+      </svg>
+      <span id="mTimer">30</span>
+    </div>
+    <ol id="mSteps" class="steps"></ol>
+    <div class="m-actions">
+      <button class="btn ghost" id="mSnooze">ذكرني بعد ٥ د</button>
+      <button class="btn primary" id="mDone">تم ✅</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const AREAS = {
+  neck:{label:'الرقبة',icon:'🧠'}, shoulders:{label:'الكتفين',icon:'💪'},
+  back:{label:'الظهر',icon:'🦴'}, wrists:{label:'الرسغين',icon:'🖐️'},
+  hips:{label:'الحوض والأرجل',icon:'🦵'}, eyes:{label:'العيون',icon:'👀'},
+  full:{label:'الجسم كامل',icon:'🙆'}
+};
+
+const STRETCHES = [
+  {id:'neck-tilt',area:'neck',name:'إمالة الرقبة الجانبية',dur:30,anim:'a-neck-tilt',steps:['اجلس مستقيم وكتفيك مرتاحين','أمِل رأسك لليمين بلطف لين تحس بشد بجانب الرقبة','خذ نفس عميق وابقَ ١٥ ثانية','ارجع وكرّر على اليسار']},
+  {id:'chin-tuck',area:'neck',name:'سحب الذقن للخلف',dur:30,anim:'a-chin-tuck',steps:['انظر للأمام مباشرة','اسحب ذقنك للخلف كأنك تسوي ذقن مزدوج','ابقَ ٥ ثواني وارجع','كرّر ٦ مرات']},
+  {id:'neck-roll',area:'neck',name:'نصف دائرة للرقبة',dur:30,anim:'a-neck-roll',steps:['أنزل ذقنك على صدرك','لُف رأسك ببطء لليمين ثم اليسار','لا ترجع لورا أبداً','كرّر ببطء ٦ مرات']},
+  {id:'shrug',area:'shoulders',name:'رفع الكتفين والاسترخاء',dur:25,anim:'a-shrug',steps:['ارفع كتفيك لأذنيك بقوة','شدّ ٣ ثواني','أفلتهما مرة وحدة مع نفس زفير','كرّر ٨ مرات']},
+  {id:'trap',area:'shoulders',name:'تمديد شبه المنحرفة',dur:30,anim:'a-trap',steps:['ارفع يدك اليمنى فوق راسك','حط كفك على الجانب الأيسر من راسك','اسحب راسك بلطف لليمين','١٥ ثانية وبدّل الجهة']},
+  {id:'chest-open',area:'shoulders',name:'فتح الصدر',dur:30,anim:'a-chest',steps:['شبّك يديك ورا ظهرك','افتح صدرك وارجع كتفيك لورا','ارفع يديك شوي وابقَ ٢٠ ثانية','خذ نفس عميق']},
+  {id:'shoulder-roll',area:'shoulders',name:'تدوير الكتفين',dur:25,anim:'a-shoulder-roll',steps:['ارفع كتفيك','لُفهم دائرة كاملة لورا','١٠ دورات لورا و١٠ لقدام','ببطء وبدون شد']},
+  {id:'seated-twist',area:'back',name:'لف العمود الفقري جالساً',dur:40,anim:'a-twist',steps:['اجلس مستقيم ويديك على بطنك','لُف جسمك لليمين وامسك ظهر الكرسي','ابقَ ٢٠ ثانية مع نفس عميق','ارجع وبدّل لليسار']},
+  {id:'cat-cow',area:'back',name:'قطة–بقرة جالساً',dur:40,anim:'a-catcow',steps:['حط يديك على ركبك','قوّس ظهرك للداخل وسقط راسك (قطة)','بعدين افتح صدرك وارفع راسك (بقرة)','كرّر ١٠ مرات ببطء']},
+  {id:'upper-back',area:'back',name:'تمديد أعلى الظهر',dur:30,anim:'a-upperback',steps:['شبّك يديك ومدهم للأمام','دوّر كفوفك للخارج وابعّد كتفيك','ابقَ ٢٠ ثانية','بتحس بشد بين الكتفين']},
+  {id:'wrist-circle',area:'wrists',name:'تدوير الرسغين',dur:20,anim:'a-wrist',steps:['ارفع يديك أمامك','لُف رسغيك ١٠ دوائر لكل جهة','حرّك الأصابع معهم','خفيف وبدون ألم']},
+  {id:'prayer',area:'wrists',name:'تمديد باطن الكف',dur:25,anim:'a-prayer',steps:['ضم كفيك لبعض أمام صدرك','أنزلهم لتحت بلطف لين تحس بشد بالرسغ','ابقَ ١٥ ثانية','بعدين اقلبهم للأعلى']},
+  {id:'fingers',area:'wrists',name:'تمديد الأصابع',dur:20,anim:'a-fingers',steps:['افتح كفك وابعد أصابعك لأقصى حد','شدّ ٥ ثواني','أرخِ وكرّر ٦ مرات','حرّكهم بسرعة بآخر ٥ ثواني']},
+  {id:'figure4',area:'hips',name:'وضعية الرقم ٤',dur:40,anim:'a-figure4',steps:['اجلس على الكرسي','حط كاحلك اليمين على ركبتك اليسرى','اضغط على ركبتك اليمين بلطف لتحت','٢٠ ثانية وبدّل']},
+  {id:'hip-flexor',area:'hips',name:'تمديد مثنيات الورك',dur:30,anim:'a-hipflexor',steps:['قف وحط يدك على الطاولة','خطوة كبيرة لقدام برجل وحدة','ادفع حوضك لقدام لين تحس بشد بأعلى الفخذ','٢٠ ثانية وبدّل']},
+  {id:'calf',area:'hips',name:'رفع الكعبين',dur:30,anim:'a-calf',steps:['قف مستقيم','ارفع كعبيك ووقف على أطراف أصابعك','ابقَ ثانية وانزل ببطء','كرّر ١٥ مرة']},
+  {id:'eye-2020',area:'eyes',name:'قاعدة ٢٠-٢٠-٢٠',dur:20,anim:'a-eye',steps:['بص بعيد عن الشاشة ٢٠ قدم','٢٠ ثانية كاملة','رمّش ببطء وبشكل طبيعي','لا تحك عينك']},
+  {id:'eye-roll',area:'eyes',name:'تدوير العينين',dur:20,anim:'a-eye',steps:['بص فوق وبعدين يمين','بعدين تحت ويسار','٥ دورات لكل جهة','ببطء وبدون ضغط']},
+  {id:'full-reach',area:'full',name:'تمديد الجسم كامل',dur:20,anim:'a-fullreach',steps:['ارفع يديك فوق راسك','شبّك أصابعك ومدّ للعلى','خذ نفس عميق وابقَ ١٠ ثواني','نزّل يديك بزفير طويل']}
+];
+
+const TONES = {
+  sarcastic:{label:'ساخر',
+    idle:['أربع ساعات قعدة… وأنا اللي تعبان؟ 🦥','جسمك يرسل شكاوى، بس مين يسمع.','الكرسي صار جزء منك تقريباً.','تذكر إنك كائن حي، مش نبات مكتبي.'],
+    done:['أوه! تحركت فعلاً 😲','شكراً، أنقذت فقراتك.','استمر، بديت تشبه إنسان.'],
+    missed:['تخطيت؟ طبعاً. متوقع منك.','الوقت يمشي، وجسمك واقف.']},
+  encouraging:{label:'مشجّع',
+    idle:['٣٠ ثانية بس وترجع أحسن 💪','جسمك بيشكرك قبل ما تبدأ.','خطوة صغيرة، فرق كبير.'],
+    done:['أحسنت! 👏','كذا! استمر على هالحال.','إنجاز حقيقي 🎉'],
+    missed:['ولا يهمك، الجاية أحسن 🙂','بسيطة، نكمّل من جديد.']},
+  energetic:{label:'متحمس',
+    idle:['يلا نتحرك! 🔥','وقت الحركة يا بطل!','٣٠ ثانية وترجع تولّع!'],
+    done:['وحش! 🐉','برافو! 🔥','كذا الشغل! 💥'],
+    missed:['ولا مرة! يلا المرة الجاية!','قوم قوم، ما بنستسلم!']},
+  silent:{label:'صامت',idle:[''],done:[''],missed:['']}
+};
+
+const LEVELS = [
+  {xp:0,name:'خشب متيبّس 🪵'},{xp:100,name:'بدأ يتحرك 🐢'},
+  {xp:300,name:'مرتاح شوي 🚶'},{xp:600,name:'مرن 🏃'},
+  {xp:1000,name:'مرن فعلاً 🤸'},{xp:2000,name:'مطّاط بشري 🧘'}
+];
+
+const BADGES = [
+  {id:'first',ico:'🌱',name:'أول حركة',test:s=>s.totalDone>=1},
+  {id:'ten',ico:'🔟',name:'١٠ تمارين',test:s=>s.totalDone>=10},
+  {id:'fifty',ico:'🏅',name:'٥٠ تمرين',test:s=>s.totalDone>=50},
+  {id:'hundred',ico:'💯',name:'١٠٠ تمرين',test:s=>s.totalDone>=100},
+  {id:'streak3',ico:'🔥',name:'٣ أيام',test:s=>s.bestStreak>=3},
+  {id:'streak7',ico:'⚡',name:'أسبوع كامل',test:s=>s.bestStreak>=7},
+  {id:'streak30',ico:'👑',name:'شهر كامل',test:s=>s.bestStreak>=30},
+  {id:'early',ico:'🌅',name:'بدري',test:s=>s.history.some(h=>new Date(h.ts).getHours()<9)},
+  {id:'night',ico:'🌙',name:'سهرة',test:s=>s.history.some(h=>new Date(h.ts).getHours()>=21)}
+];
+
+const FIGURE_SVG = `<svg class="fig" viewBox="0 0 200 260" aria-hidden="true">
+  <path class="leg-l" d="M100 180 L78 226 L78 252"/>
+  <path class="leg-r" d="M100 180 L122 226 L122 252"/>
+  <g class="upper">
+    <line class="torso" x1="100" y1="96" x2="100" y2="180"/>
+    <path class="arm-l" d="M100 108 L64 144 L60 180"/>
+    <path class="arm-r" d="M100 108 L136 144 L140 180"/>
+    <g class="head">
+      <circle class="skull" cx="100" cy="66" r="26"/>
+      <circle class="eye" cx="91" cy="62" r="3.5"/>
+      <circle class="eye" cx="109" cy="62" r="3.5"/>
+    </g>
+  </g>
+</svg>`;
+
+/* ========== Capacitor Detection ========== */
+const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const LN = isNative ? window.Capacitor.Plugins.LocalNotifications : null;
+const AppPlugin = isNative ? window.Capacitor.Plugins.App : null;
+
+/* ========== State ========== */
+const LS_KEY='stiff.v1';
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const todayKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+const DEFAULTS=()=>({
+  settings:{start:'09:00',end:'17:00',interval:45,days:[0,1,2,3,4],tone:'sarcastic',goal:8},
+  xp:0,streak:0,bestStreak:0,lastDoneDate:null,totalDone:0,history:[],badges:[],
+  daily:{date:todayKey(),done:0},nextAt:null,lastMoveId:null
+});
+
+let S=load();
+let paused=false,currentMove=null,moveTimer=null,moveLeft=0,currentFilter='all';
+
+function load(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return DEFAULTS();
+    const p=JSON.parse(raw);
+    return {...DEFAULTS(),...p,settings:{...DEFAULTS().settings,...(p.settings||{})}};
+  }catch{return DEFAULTS();}
+}
+function save(){localStorage.setItem(LS_KEY,JSON.stringify(S));}
+
+function inWindow(d){
+  const s=S.settings;
+  if(!s.days.includes(d.getDay()))return false;
+  const [sh,sm]=s.start.split(':').map(Number);
+  const [eh,em]=s.end.split(':').map(Number);
+  const m=d.getHours()*60+d.getMinutes();
+  return m>=sh*60+sm&&m<=eh*60+em;
+}
+function nextSlot(fromMs){
+  let t=new Date(fromMs);t.setSeconds(0,0);
+  for(let i=0;i<20160;i++){if(inWindow(t))return t.getTime();t=new Date(t.getTime()+60000);}
+  return fromMs+3600000;
+}
+function scheduleNext(fromMs){
+  S.nextAt=nextSlot((fromMs||Date.now())+S.settings.interval*60000);
+  save();
+}
+function randomOf(a){return a[Math.floor(Math.random()*a.length)];}
+function pickMove(ex){const p=STRETCHES.filter(s=>s.id!==ex);return p[Math.floor(Math.random()*p.length)];}
+
+/* ========== Native Notifications ========== */
+async function scheduleNativeNotifications(){
+  if(!LN)return;
+  try{
+    const pending=await LN.getPending();
+    if(pending.notifications.length>0)await LN.cancel(pending);
+    const notifications=[];
+    let nextId=1000;
+    for(let dayOffset=0;dayOffset<7;dayOffset++){
+      const day=new Date();
+      day.setDate(day.getDate()+dayOffset);
+      day.setHours(0,0,0,0);
+      if(!S.settings.days.includes(day.getDay()))continue;
+      const [sh,sm]=S.settings.start.split(':').map(Number);
+      const [eh,em]=S.settings.end.split(':').map(Number);
+      const startMin=sh*60+sm, endMin=eh*60+em;
+      for(let m=startMin+S.settings.interval;m<=endMin;m+=S.settings.interval){
+        const when=new Date(day);
+        when.setMinutes(m);
+        if(when.getTime()<=Date.now()+30000)continue;
+        const move=STRETCHES[Math.floor(Math.random()*STRETCHES.length)];
+        notifications.push({
+          id:nextId++,
+          title:'🦥 وقت الحركة!',
+          body:`${move.name} — ${move.dur} ثانية بس`,
+          schedule:{at:when,allowWhileIdle:true},
+          sound:null,
+          attachments:null,
+          actionTypeId:'',
+          extra:null
+        });
+      }
+    }
+    if(notifications.length>0)await LN.schedule({notifications});
+  }catch(e){console.warn('scheduleNative:',e);}
+}
+
+async function cancelNativeNotifications(){
+  if(!LN)return;
+  try{
+    const pending=await LN.getPending();
+    if(pending.notifications.length>0)await LN.cancel(pending);
+    await LN.removeAllDeliveredNotifications();
+  }catch(e){console.warn('cancelNative:',e);}
+}
+
+/* ========== Render ========== */
+function renderHome(){
+  const tk=todayKey();
+  if(S.daily.date!==tk){S.daily={date:tk,done:0};save();}
+  $('#homeStreak').textContent=S.streak;
+  $('#homeToday').textContent=`${S.daily.done}/${S.settings.goal}`;
+  const pct=Math.min(100,Math.round(S.daily.done/S.settings.goal*100));
+  $('#cupFill').style.width=pct+'%';
+  $('#goalPct').textContent=pct+'%';
+  $('#mascotText').textContent=randomOf(TONES[S.settings.tone].idle)||'';
+  updateCountdown(S.nextAt?S.nextAt-Date.now():null);
+}
+
+function updateCountdown(left){
+  const el=$('#countdown');
+  if(left==null){el.textContent='--:--';return;}
+  if(left<=0){el.textContent='الآن!';el.classList.add('soon');return;}
+  el.classList.remove('soon');
+  const m=Math.floor(left/60000), s=Math.floor(left%60000/1000);
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function renderMoves(filter){
+  filter=filter||'all';
+  const list=filter==='all'?STRETCHES:STRETCHES.filter(s=>s.area===filter);
+  $('#movesList').innerHTML=list.map(s=>`
+    <div class="move" data-id="${s.id}">
+      <div class="move-art ${s.anim}">${FIGURE_SVG}</div>
+      <div><h4>${s.name}</h4><p>${AREAS[s.area].label} · ${s.dur} ثانية</p></div>
+    </div>`).join('');
+  $$('#movesList .move').forEach(el=>{
+    const s=STRETCHES.find(x=>x.id===el.dataset.id);
+    el.onclick=()=>openBreak(s);
+  });
+}
+
+function renderProgress(){
+  const lvl=[...LEVELS].reverse().find(l=>S.xp>=l.xp)||LEVELS[0];
+  const next=LEVELS.find(l=>l.xp>S.xp);
+  $('#lvlName').textContent=lvl.name;
+  $('#statTotal').textContent=S.totalDone;
+  $('#statBest').textContent=S.bestStreak;
+  $('#xpText').textContent=`${S.xp} XP`;
+  $('#xpNext').textContent=next?`باقي ${next.xp-S.xp} للمستوى الجاي`:'أعلى مستوى 🏆';
+  const base=lvl.xp,top=next?next.xp:lvl.xp+1;
+  $('#lvlBar').style.width=Math.min(100,(S.xp-base)/(top-base)*100)+'%';
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const k=todayKey(d);
+    const c=S.history.filter(h=>todayKey(new Date(h.ts))===k).length;
+    days.push({name:['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'][d.getDay()],c});
+  }
+  const max=Math.max(1,...days.map(d=>d.c));
+  $('#weekChart').innerHTML=days.map(d=>`<div class="day"><div class="bar2" style="height:${d.c/max*100}%"></div><span class="dname">${d.name}</span></div>`).join('');
+  $('#badgesList').innerHTML=BADGES.map(b=>{
+    const e=S.badges.includes(b.id);
+    return `<div class="badge ${e?'earned':''}"><span class="ico">${b.ico}</span>${b.name}</div>`;
+  }).join('');
+}
+
+function renderSettings(){
+  $('#setStart').value=S.settings.start;
+  $('#setEnd').value=S.settings.end;
+  $('#setInterval').value=S.settings.interval;
+  $('#setGoal').value=S.settings.goal;
+  const dn=['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'];
+  $('#dayPicker').innerHTML=dn.map((n,i)=>`<button data-day="${i}" class="${S.settings.days.includes(i)?'on':''}">${n}</button>`).join('');
+  $$('#dayPicker button').forEach(b=>b.onclick=()=>{
+    const d=+b.dataset.day;const arr=S.settings.days;const i=arr.indexOf(d);
+    i>-1?arr.splice(i,1):arr.push(d);
+    save();renderSettings();scheduleNext();
+  });
+  $('#toneChips').innerHTML=Object.entries(TONES).map(([k,v])=>`<button class="chip ${S.settings.tone===k?'on':''}" data-tone="${k}">${v.label}</button>`).join('');
+  $$('#toneChips .chip').forEach(c=>c.onclick=()=>{
+    S.settings.tone=c.dataset.tone;save();renderSettings();renderHome();
+  });
+  updateNotifButton();
+}
+
+async function updateNotifButton(){
+  const btn=$('#btnNotif');
+  let granted=false;
+  if(isNative){
+    try{const c=await LN.checkPermissions();granted=c.display==='granted';}catch{}
+  }else{
+    granted='Notification' in window&&Notification.permission==='granted';
+  }
+  btn.textContent=granted?'✅ الإشعارات مفعّلة':'تفعيل الإشعارات';
+}
+
+/* ========== Break Modal ========== */
+function openBreak(stretch){
+  const s=stretch||pickMove(S.lastMoveId);
+  currentMove=s;S.lastMoveId=s.id;save();
+  $('#mArea').textContent=`${AREAS[s.area].icon} ${AREAS[s.area].label}`;
+  $('#mName').textContent=s.name;
+  const art=$('#mArt');
+  art.className='m-art '+s.anim;
+  art.innerHTML=FIGURE_SVG;
+  $('#mSteps').innerHTML=s.steps.map(t=>`<li>${t}</li>`).join('');
+  moveLeft=s.dur;updateRing();
+  clearInterval(moveTimer);
+  moveTimer=setInterval(()=>{
+    moveLeft--;updateRing();
+    if(moveLeft<=0){clearInterval(moveTimer);completeBreak(true);}
+  },1000);
+  paused=true;
+  $('#breakModal').hidden=false;
+  if(navigator.vibrate)navigator.vibrate([120,60,120]);
+}
+
+function updateRing(){
+  const s=currentMove;if(!s)return;
+  const C=327;
+  $('#ringFg').style.strokeDashoffset=C*(1-moveLeft/s.dur);
+  $('#mTimer').textContent=Math.max(0,moveLeft);
+}
+
+function closeModal(){$('#breakModal').hidden=true;paused=false;clearInterval(moveTimer);}
+
+function completeBreak(auto){
+  const s=currentMove;
+  closeModal();
+  const onTime=!auto||moveLeft<=0;
+  const gain=10+(onTime?5:0);
+  S.xp+=gain;S.totalDone++;
+  S.history.push({ts:Date.now(),id:s.id});
+  if(S.history.length>500)S.history=S.history.slice(-500);
+  const tk=todayKey();
+  if(S.lastDoneDate!==tk){
+    const y=new Date();y.setDate(y.getDate()-1);
+    S.streak=(S.lastDoneDate===todayKey(y))?S.streak+1:1;
+    S.lastDoneDate=tk;
+    S.bestStreak=Math.max(S.bestStreak,S.streak);
+  }
+  if(S.daily.date===tk)S.daily.done++;
+  else S.daily={date:tk,done:1};
+  BADGES.forEach(b=>{if(!S.badges.includes(b.id)&&b.test(S))S.badges.push(b.id);});
+  scheduleNext();save();renderAll();
+  toast(`+${gain} XP ${randomOf(TONES[S.settings.tone].done)||''}`);
+}
+
+function snooze(min){
+  closeModal();
+  S.nextAt=Date.now()+min*60000;save();renderHome();
+  toast(`تمام، بعد ${min} دقايق 🕐`);
+}
+
+function skipBreak(){
+  closeModal();
+  toast(randomOf(TONES[S.settings.tone].missed)||'ما مشكلة');
+  scheduleNext();renderAll();
+}
+
+function tick(){
+  if(paused)return;
+  const tk=todayKey();
+  if(S.daily.date!==tk){S.daily={date:tk,done:0};save();renderHome();}
+  if(!S.nextAt)scheduleNext();
+  const left=S.nextAt-Date.now();
+  updateCountdown(left);
+  if(left<=0){paused=true;fireReminder();}
+}
+
+function fireReminder(){
+  // In native mode, OS notification handles the wake-up. Here we just show modal.
+  if(!isNative && 'Notification' in window && Notification.permission==='granted'){
+    const s=pickMove(S.lastMoveId);
+    const body=`وقت ${s.name} — ${s.dur} ثانية بس`;
+    if(navigator.serviceWorker&&navigator.serviceWorker.ready){
+      navigator.serviceWorker.ready.then(reg=>{
+        reg.showNotification('🦥 وقت الحركة!',{body,tag:'stiff-break',renotify:true,vibrate:[200,100,200]});
+      }).catch(()=>{});
+    }
+  }
+  openBreak();
+}
+
+let toastT;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.hidden=false;
+  clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200);
+}
+
+function renderAll(){renderHome();renderMoves(currentFilter);renderProgress();}
+
+function go(name){
+  $$('.screen').forEach(s=>s.classList.toggle('active',s.id===`screen-${name}`));
+  $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.go===name));
+  if(name==='progress')renderProgress();
+  if(name==='settings')renderSettings();
+  if(name==='home')renderHome();
+}
+
+/* ========== Events ========== */
+$$('.tab').forEach(t=>t.onclick=()=>go(t.dataset.go));
+$('#btnStartNow').onclick=()=>{paused=true;openBreak();};
+$('#mClose').onclick=skipBreak;
+$('#mDone').onclick=()=>completeBreak(false);
+$('#mSnooze').onclick=()=>snooze(5);
+
+$('#setStart').onchange=e=>{S.settings.start=e.target.value;save();scheduleNext();};
+$('#setEnd').onchange=e=>{S.settings.end=e.target.value;save();scheduleNext();};
+$('#setInterval').onchange=e=>{S.settings.interval=+e.target.value;save();scheduleNext();renderHome();};
+$('#setGoal').onchange=e=>{S.settings.goal=Math.max(1,+e.target.value);save();renderHome();};
+
+$('#btnNotif').onclick=async()=>{
+  if(isNative){
+    try{
+      const c=await LN.checkPermissions();
+      if(c.display!=='granted'){
+        const r=await LN.requestPermissions();
+        if(r.display==='granted'){toast('تم تفعيل الإشعارات 🔔');renderSettings();}
+        else toast('ما تم التفعيل');
+      }else toast('الإشعارات مفعلة ✅');
+    }catch(e){toast('خطأ: '+e.message);}
+  }else{
+    if(!('Notification' in window))return toast('جهازك ما يدعم الإشعارات');
+    try{
+      const p=await Notification.requestPermission();
+      renderSettings();
+      if(p==='granted')toast('تم تفعيل الإشعارات 🔔');
+      else toast('ما تم التفعيل');
+    }catch(e){toast('صار خطأ');}
+  }
+};
+
+$('#btnReset').onclick=()=>{
+  if(confirm('متأكد؟ رح ينمسح كل شي.')){
+    localStorage.removeItem(LS_KEY);S=DEFAULTS();save();
+    scheduleNext();renderAll();renderSettings();toast('تم المسح');
+  }
+};
+
+$('#areaChips').innerHTML=`<button class="chip on" data-area="all">الكل</button>`+
+  Object.entries(AREAS).map(([k,v])=>`<button class="chip" data-area="${k}">${v.icon} ${v.label}</button>`).join('');
+$$('#areaChips .chip').forEach(c=>c.onclick=()=>{
+  currentFilter=c.dataset.area;
+  $$('#areaChips .chip').forEach(x=>x.classList.toggle('on',x===c));
+  renderMoves(currentFilter);
+});
+
+/* ========== PWA (web only) ========== */
+if('serviceWorker' in navigator && !isNative){
+  navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e));
+}
+
+/* ========== Native lifecycle ========== */
+if(isNative){
+  cancelNativeNotifications();
+  if(AppPlugin){
+    AppPlugin.addListener('appStateChange',async({isActive})=>{
+      if(isActive)await cancelNativeNotifications();
+      else await scheduleNativeNotifications();
+    });
+  }
+  if(LN){
+    LN.addListener('localNotificationActionPerformed',()=>{
+      renderAll();
+    });
+  }
+}
+
+document.addEventListener('visibilitychange',async()=>{
+  if(isNative){
+    if(document.hidden)await scheduleNativeNotifications();
+    else await cancelNativeNotifications();
+  }
+  if(!document.hidden)renderAll();
+});
+
+/* ========== Init ========== */
+renderAll();
+renderSettings();
+if(!S.nextAt)scheduleNext();
+setInterval(tick,1000);
+</script>
+</body>
+</html>
